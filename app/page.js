@@ -56,19 +56,26 @@ export default function Home() {
   ];
 
   const perfumes = [
-    { id: 1, name: "Midnight Oud", price: "₹4,999", category: "Oriental", image: "🌙" },
-    { id: 2, name: "Rose Garden", price: "₹3,499", category: "Floral", image: "🌹" },
-    { id: 3, name: "Ocean Breeze", price: "₹2,999", category: "Fresh", image: "🌊" },
-    { id: 4, name: "Amber Sunset", price: "₹5,499", category: "Woody", image: "🌅" },
+    { id: 1, name: "Midnight Oud", price: "₹4,999", category: "Oriental", image: "/images/perfume_img_4.jpg" },
+    { id: 2, name: "Rose Garden", price: "₹3,499", category: "Floral", image: "/images/perfume_img_5.jpg" },
+    { id: 3, name: "Ocean Breeze", price: "₹2,999", category: "Fresh", image: "/images/perfume_img_6.jpg" },
+    { id: 4, name: "Amber Sunset", price: "₹5,499", category: "Woody", image: "/images/perfume_img_7.jpg" },
+    { id: 5, name: "Velvet Musk", price: "₹4,299", category: "Musky", image: "/images/perfume_img_8.jpg" },
   ];
 
   // Auto-play carousel
   useEffect(() => {
+    if (isAnimating) return;
+    
     const interval = setInterval(() => {
-      handleNextSlide();
+      // Logic for next slide without using the closure-captured handleNextSlide
+      // to ensure we always have fresh state or simply trigger the state update directly
+      setIsAnimating(true);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setTimeout(() => setIsAnimating(false), 600);
     }, 5000);
     return () => clearInterval(interval);
-  }, [currentSlide]);
+  }, [currentSlide, isAnimating]);
 
   const handleNextSlide = () => {
     if (!isAnimating) {
@@ -95,10 +102,10 @@ export default function Home() {
   };
 
   const categories = [
-    { name: "For Him", icon: "👔", count: "150+ Perfumes" },
-    { name: "For Her", icon: "💄", count: "200+ Perfumes" },
-    { name: "Unisex", icon: "✨", count: "80+ Perfumes" },
-    { name: "Gift Sets", icon: "🎁", count: "50+ Sets" },
+    { name: "For Him", image: "/images/him.png", count: "150+ Perfumes" },
+    { name: "For Her", image: "/images/her.png", count: "200+ Perfumes" },
+    { name: "Unisex", image: "/images/unisex.png", count: "80+ Perfumes" },
+    { name: "Gift Sets", image: "/images/gift.png", count: "50+ Sets" },
   ];
 
   return (
@@ -237,7 +244,14 @@ export default function Home() {
           <div className="categories-grid">
             {categories.map((cat, idx) => (
               <div key={idx} className="category-card" style={{ animationDelay: `${idx * 0.1}s` }}>
-                <div className="category-icon">{cat.icon}</div>
+                <div className="category-icon">
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    width={80}
+                    height={80}
+                  />
+                </div>
                 <h3>{cat.name}</h3>
                 <p>{cat.count}</p>
                 <Link href={`/category/${cat.name.toLowerCase()}`} className="category-link">
@@ -259,8 +273,13 @@ export default function Home() {
           <div className="products-grid">
             {perfumes.map((perfume, idx) => (
               <div key={perfume.id} className="product-card" style={{ animationDelay: `${idx * 0.15}s` }}>
-                <div className="product-image">
-                  <span className="product-emoji">{perfume.image}</span>
+                <div className="product-card-image">
+                  <Image
+                    src={perfume.image}
+                    alt={perfume.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
                   <span className="product-badge">Bestseller</span>
                 </div>
                 <div className="product-info">
@@ -318,7 +337,14 @@ export default function Home() {
               </Link>
             </div>
             <div className="offer-visual">
-              <div className="gift-icon">🎁</div>
+              <div className="gift-icon">
+                <Image
+                  src="/images/gift.png"
+                  alt="Gift Set"
+                  width={200}
+                  height={200}
+                />
+              </div>
             </div>
           </div>
         </div>
