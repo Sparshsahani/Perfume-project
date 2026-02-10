@@ -113,11 +113,11 @@ export default function Home() {
       {/* Premium Hero Carousel Section */}
       <section className="hero-carousel">
         {/* Background animated elements */}
-        <div className="hero-bg-elements">
+        {/* <div className="hero-bg-elements">
           <div className="floating-circle circle-1"></div>
           <div className="floating-circle circle-2"></div>
           <div className="floating-circle circle-3"></div>
-        </div>
+        </div> */}
 
         {/* Carousel Slides */}
         <div className="carousel-container">
@@ -130,17 +130,26 @@ export default function Home() {
               ${index === currentSlide + 1 || (currentSlide === heroSlides.length - 1 && index === 0) ? 'next' : ''}`}
               style={{'--overlay-gradient': slide.gradient}}
             >
-              {/* Video Background */}
-              <video
-                className="slide-video"
-                autoPlay
-                loop
-                muted
-                playsInline
-                key={slide.video}
-              >
-                <source src={slide.video} type="video/mp4" />
-              </video>
+              {/* Background image (full-bleed) */}
+              {slide.image && (
+                <div
+                  className="slide-bg-image"
+                  style={{ backgroundImage: `url(${slide.image})` }}
+                />
+              )}
+              {/* Video Background (fallback / optional) */}
+              {slide.video && (
+                <video
+                  className="slide-video"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  key={slide.video}
+                >
+                  <source src={slide.video} type="video/mp4" />
+                </video>
+              )}
               {/* Gradient Overlay */}
               <div className="slide-overlay"></div>
               <div className="carousel-content">
@@ -243,7 +252,14 @@ export default function Home() {
           <h2 className="section-title">Shop by Category</h2>
           <div className="categories-grid">
             {categories.map((cat, idx) => (
-              <div key={idx} className="category-card" style={{ animationDelay: `${idx * 0.1}s` }}>
+              <div
+                key={idx}
+                className={`category-card bg-image`}
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
+                {/* Background element so we can blur without affecting content */}
+                <div className="category-bg" style={{ backgroundImage: `url(${cat.image})` }} />
+
                 <div className="category-icon">
                   <Image
                     src={cat.image}
@@ -280,13 +296,16 @@ export default function Home() {
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                  <span className="product-badge">Bestseller</span>
+                  <span className="product-card-badge">Bestseller</span>
                 </div>
-                <div className="product-info">
-                  <span className="product-category">{perfume.category}</span>
-                  <h3 className="product-name">{perfume.name}</h3>
-                  <div className="product-footer">
-                    <span className="product-price">{perfume.price}</span>
+                <div className="product-card-info">
+                  <span className="product-card-category">{perfume.category}</span>
+                  <h3 className="product-card-name">{perfume.name}</h3>
+                  <div className="product-card-footer">
+                    <div className="product-card-price">
+                      <span className="price-amount">{perfume.price}</span>
+                      <span className="price-label">Price</span>
+                    </div>
                     <button className="btn-add-cart">Add to Cart</button>
                   </div>
                 </div>

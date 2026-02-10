@@ -234,7 +234,20 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
   pointer-events: none;
   overflow: hidden;
   
-  // Video Background
+  // Background image (full-bleed)
+  .slide-bg-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+    filter: brightness(1.05) saturate(1.05);
+    transform: scale(1.03);
+    transition: transform 30s ease-in-out;
+  }
+
+  // Video Background (optional fallback)
   .slide-video {
     position: absolute;
     top: 50%;
@@ -247,9 +260,16 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
     object-fit: cover;
     z-index: 0;
     filter: brightness(1.05) saturate(1.1);
+    display: none; // hide by default to prioritize images
   }
-  
-  // Gradient Overlay on Video
+
+  // when slide is active, allow video to appear if needed
+  &.active .slide-video {
+    display: block;
+    animation: zoomIn 1s ease forwards, slowZoom 30s ease-in-out infinite;
+  }
+
+  // Gradient Overlay on top of background
   .slide-overlay {
     position: absolute;
     top: 0;
@@ -259,6 +279,12 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
     z-index: 1;
     background: linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
     opacity: 1; 
+  }
+
+  // Slow zoom for background images on active slide
+  &.active .slide-bg-image {
+    animation: slowZoomBg 30s ease-in-out infinite;
+    transform: scale(1.06);
   }
   
   &.active .slide-overlay {
@@ -302,7 +328,7 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
   max-width: 1280px;
   margin: 0 auto;
   padding: 100px 60px 200px;
-  height: 100%;
+  height: 50%;
   position: relative;
   z-index: 10;
 }
@@ -705,11 +731,13 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .category-card {
+  position: relative;
   padding: 2.5rem 2rem;
   background: $white;
   border-radius: 20px;
   text-align: center;
   box-shadow: $shadow-md;
+  overflow: hidden;
   @include card-hover;
   animation: fadeInUp 0.6s ease backwards;
   
@@ -740,6 +768,117 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
       color: $primary-dark;
     }
   }
+
+  // Background-image modifier
+  &.bg-image {
+    background: none;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    color: $white;
+    padding: 3rem 2rem;
+    position: relative;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+
+    /* Background element placed under overlay and content so we can blur it */
+    .category-bg {
+      position: absolute;
+      inset: 0;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: $light-gray;
+      filter: blur(6px) saturate(1.05);
+      transform: scale(1.03);
+      z-index: 0;
+      transition: filter 0.4s ease, transform 0.4s ease;
+      will-change: filter, transform;
+    }
+
+    /* overlay sits above the blurred bg */
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.5));
+      z-index: 1;
+      transition: background 0.4s ease;
+    }
+
+    // make all inner content above overlay
+    .category-icon,
+    h3,
+    p,
+    .category-link {
+      position: relative;
+      z-index: 2;
+    }
+
+    .category-icon {
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    h3 {
+      color: $white;
+      text-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transition: text-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    p {
+      color: rgba(255,255,255,0.95);
+      margin-bottom: 1.25rem;
+      transition: color 0.3s ease;
+    }
+
+    .category-link {
+      color: rgba(255,255,255,0.95);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 8px 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.12);
+      display: inline-block;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255,255,255,0.1);
+        color: $white;
+      }
+    }
+
+    // Premium hover effects
+    &:hover {
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+      transform: translateY(-8px);
+
+      .category-bg {
+        filter: blur(4px) saturate(1.2) brightness(1.1);
+        transform: scale(1.08);
+      }
+
+      &::before {
+        background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.4));
+      }
+
+      .category-icon {
+        background: rgba(255,255,255,0.15);
+        transform: scale(1.1) rotate(5deg);
+      }
+
+      h3 {
+        text-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        transform: translateY(-2px);
+      }
+
+      p {
+        color: rgba(255,255,255,1);
+      }
+    }
+  }
 }
 
 // ==========================================
@@ -753,17 +892,44 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2.5rem;
 }
 
 .product-card {
   background: $white;
-  border-radius: 20px;
+  border-radius: 24px;
   overflow: hidden;
   box-shadow: $shadow-md;
-  @include card-hover;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeInUp 0.6s ease backwards;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
+    padding: 2px;
+    background: $gradient;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 50px rgba(99, 102, 241, 0.15);
+    
+    &::before {
+      opacity: 0.6;
+    }
+  }
   
   &-image {
     position: relative;
@@ -776,59 +942,162 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.6s ease;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     &:hover img {
-      transform: scale(1.05);
+      transform: scale(1.08);
+      filter: brightness(1.05);
     }
   }
   
   &-badge {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 6px 14px;
+    top: 20px;
+    right: 20px;
+    padding: 8px 18px;
     background: $gradient;
     color: $white;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    border-radius: 25px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    backdrop-filter: blur(10px);
+    animation: pulse 2s ease-in-out infinite;
   }
   
   &-info {
-    padding: 1.5rem;
+    padding: 2rem 1.75rem;
+    background: $white;
+    position: relative;
   }
   
   &-category {
     display: inline-block;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: $primary-color;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.75rem;
+    padding: 4px 12px;
+    background: rgba(99, 102, 241, 0.08);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(99, 102, 241, 0.15);
+      transform: translateX(3px);
+    }
   }
   
   &-name {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.375rem;
+    font-weight: 800;
     color: $dark;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: $primary-color;
+    }
+  }
+  
+  &-description {
+    font-size: 0.875rem;
+    color: $gray;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  &-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     margin-bottom: 1rem;
+    
+    .stars {
+      color: #fbbf24;
+      font-size: 0.875rem;
+      letter-spacing: 2px;
+    }
+    
+    .rating-count {
+      font-size: 0.75rem;
+      color: $gray;
+      font-weight: 500;
+    }
   }
   
   &-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1.5px solid rgba(99, 102, 241, 0.08);
   }
   
   &-price {
-    font-size: 1.5rem;
-    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    .price-amount {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: $primary-color;
+      background: $gradient;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      
+      // Fallback for browsers that don't support background-clip
+      @supports not (background-clip: text) {
+        background: none;
+        color: $primary-color;
+      }
+    }
+    
+    .price-label {
+      font-size: 0.65rem;
+      color: $gray;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+  }
+  
+  .btn-add-cart {
+    padding: 10px 20px;
     background: $gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: $white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    white-space: nowrap;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
   }
 }
 
@@ -1300,6 +1569,15 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 // Cinematic Zoom Effect
+@keyframes slowZoomBg {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
 @keyframes slowZoom {
   0%, 100% {
     transform: translate(-50%, -50%) scale(1);
@@ -1511,6 +1789,12 @@ $shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
     input, button {
       width: 100%;
     }
+  }
+
+  /* Use cover on mobile so the card remains full-bleed */
+  .category-card.bg-image {
+    background-size: cover;
+    background-position: center;
   }
 }
 
